@@ -1,0 +1,1156 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "L_hjjI1fdal-",
+        "outputId": "c3b2b9cf-197a-4f63-d8d6-38e38adb234c"
+      },
+      "outputs": [
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Requirement already satisfied: experta in /usr/local/lib/python3.7/dist-packages (1.9.4)\n",
+            "Requirement already satisfied: schema==0.6.7 in /usr/local/lib/python3.7/dist-packages (from experta) (0.6.7)\n",
+            "Requirement already satisfied: frozendict==1.2 in /usr/local/lib/python3.7/dist-packages (from experta) (1.2)\n"
+          ]
+        }
+      ],
+      "source": [
+        "! pip install experta"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "VweH8aYfdbZ-"
+      },
+      "source": [
+        "# Sistemas Expertos\n",
+        "\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "9-crtZRtfVsr"
+      },
+      "outputs": [],
+      "source": [
+        "from random import choice\n",
+        "from experta import *\n",
+        "\n",
+        "\n",
+        "class Light(Fact):\n",
+        "    \"\"\"Info about the traffic light.\"\"\"\n",
+        "    pass\n",
+        "\n",
+        "\n",
+        "class RobotCrossStreet(KnowledgeEngine):\n",
+        "    @Rule(Light(color='green'))\n",
+        "    def green_light(self):\n",
+        "        print(\"Walk\")\n",
+        "\n",
+        "    @Rule(Light(color='red'))\n",
+        "    def red_light(self):\n",
+        "        print(\"Don't walk\")\n",
+        "\n",
+        "    @Rule(AS.light << Light(color=L('yellow') | L('blinking-yellow')))\n",
+        "    def cautious(self, light):\n",
+        "        print(\"Be cautious because light is\", light[\"color\"])"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "My-6-XR1filn"
+      },
+      "source": [
+        "Crear la instancia:"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "id": "N7DBTILHfy2N",
+        "outputId": "5cadb82c-df29-40cc-c090-336265e7ae2c"
+      },
+      "outputs": [
+        {
+          "data": {
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            },
+            "text/plain": [
+              "'blinking-yellow'"
+            ]
+          },
+          "execution_count": null,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "color=choice(['green', 'yellow', 'blinking-yellow', 'red'])\n",
+        "color"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "bwjLDZijf7a7"
+      },
+      "source": [
+        "Crear la "
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "6WnCiBcHf72F",
+        "outputId": "7232858f-06da-4eae-9508-e5ef86adf54a"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-0>: InitialFact()\n"
+          ]
+        }
+      ],
+      "source": [
+        "engine = RobotCrossStreet()\n",
+        "engine.reset()\n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "hm7nFD3qfzIg"
+      },
+      "source": [
+        "Declarar los hechos y ejecutar\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sSXWKel3fiwI",
+        "outputId": "77cb03d2-9052-4a7d-e5d8-3513ec460dcc"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-1>: Light(color='blinking-yellow')\n",
+            "INFO:experta.watchers.RULES:FIRE 1 cautious: <f-1>\n"
+          ]
+        },
+        {
+          "name": "stdout",
+          "output_type": "stream",
+          "text": [
+            "Be cautious because light is blinking-yellow\n"
+          ]
+        }
+      ],
+      "source": [
+        "\n",
+        "engine.declare(Light(color=color))\n",
+        "engine.run()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "WHcGKM2Qf_FJ"
+      },
+      "outputs": [],
+      "source": [
+        "engine = RobotCrossStreet()\n",
+        "engine.reset()\n",
+        "engine.facts.duplication = True\n",
+        "import time\n",
+        "for i in range(100):\n",
+        "  color=choice(['green', 'yellow', 'blinking-yellow', 'red','no-color'])\n",
+        "  engine.declare(Light(color=color))\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "Svo0g7zIV_Mz"
+      },
+      "outputs": [],
+      "source": [
+        "engine.facts"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "FSK2OASWG-vE"
+      },
+      "outputs": [],
+      "source": [
+        "engine.run()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "qafZOVSlHVrL"
+      },
+      "source": [
+        "# Generador de descuentos\n",
+        "\n",
+        "## Objetivos\n",
+        "\n",
+        "* Incentivar nuevas compras del cliente en el establecimiento\n",
+        "\n",
+        "* Fomentar el consumo de otros productos\n",
+        "\n",
+        "* Fomentar el consumo de productos con más margen de beneficio\n",
+        "\n",
+        "\n",
+        "## Entradas y Salidas\n",
+        "\n",
+        "* **Entrada**: Lista de artículos que ha comprado el consumidor\n",
+        "* **Salida**: Lista de cupones descuento que imprimir junto al recibo de compra"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "E9S759ABJdUu"
+      },
+      "outputs": [],
+      "source": [
+        "from experta import *\n",
+        "import re"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "YK1nFgSYKGnB"
+      },
+      "source": [
+        "## Hechos\n",
+        "\n",
+        "Definiremos a continuación los hechos que manejará el sistema."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "XF7YKX2mJlEy"
+      },
+      "outputs": [],
+      "source": [
+        "class Producto(Fact):\n",
+        "    \"\"\"\n",
+        "    Producto que ha comprado un cliente.\n",
+        "\n",
+        "    >>> Producto(nombre=\"pepsi\", tipo=\"refresco de cola\", cantidad=1)\n",
+        "\n",
+        "    \"\"\"\n",
+        "    pass\n",
+        "\n",
+        "class Cupon(Fact):\n",
+        "    \"\"\"\n",
+        "    Cupón a generar para la próxima compra del cliente.\n",
+        "\n",
+        "    >>> Cupon(tipo=\"2x1\", producto=\"pepsi\")\n",
+        "    \n",
+        "    \"\"\"\n",
+        "    pass\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "1U44sNZoKM3n"
+      },
+      "outputs": [],
+      "source": [
+        "class Promo(Fact):\n",
+        "    \"\"\"\n",
+        "    Promoción vigente en el comercio.\n",
+        "\n",
+        "    >>> Promo(tipo=\"2x1\", **depende_de_la_promo)\n",
+        "\n",
+        "    \"\"\"\n",
+        "    pass\n",
+        "\n",
+        "class Beneficio(Fact):\n",
+        "    \"\"\"\n",
+        "    Define los beneficios que obtiene el comercio por cada producto.\n",
+        "\n",
+        "    >>> Beneficio(nombre=\"pepsi\", tipo=\"refresco de cola\", ganancias=0.2)\n",
+        "\n",
+        "    \"\"\"\n",
+        "    pass"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "nn_RKM-FKRbo"
+      },
+      "source": [
+        "## Objetivo 1\n",
+        "### Incentivar nuevas compras del cliente en el establecimiento\n",
+        "Para esto no hay nada mejor que las típicas promociones **2x1**, **3x2**, etc.\n",
+        "\n",
+        "#### Implementación"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "tmzGx5RcKQ5D"
+      },
+      "outputs": [],
+      "source": [
+        "class OfertasNxM(KnowledgeEngine):\n",
+        "    @DefFacts()\n",
+        "    def carga_promociones_nxm(self):\n",
+        "        \"\"\"\n",
+        "        Hechos iniciales.\n",
+        "        \n",
+        "        Genera las promociones vigentes\n",
+        "        \"\"\"\n",
+        "        yield Promo(tipo=\"2x1\", producto=\"Dodot\")\n",
+        "        yield Promo(tipo=\"2x1\", producto=\"Leche Pascual\")\n",
+        "        yield Promo(tipo=\"3x2\", producto=\"Pilas AAA\")\n",
+        "    \n",
+        "    @Rule(Promo(tipo=MATCH.t & P(lambda t: re.match(r\"\\d+x\\d+\", t)),\n",
+        "                producto=MATCH.p),\n",
+        "          Producto(nombre=MATCH.p))\n",
+        "    def oferta_nxm(self, t, p):\n",
+        "        \"\"\"\n",
+        "        Sabemos que el cliente volverá para aprovechar\n",
+        "        la promoción, ya que hoy ha comprado el producto.\n",
+        "        \"\"\"\n",
+        "        self.declare(Cupon(tipo=t, producto=p))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "nshJbw7hKWgh"
+      },
+      "source": [
+        "#### Pruebas\n",
+        "Utilizaremos la función `watch` para ver qué está haciendo el motor durante la ejecución."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "tW3ryaCoKZ4q"
+      },
+      "outputs": [],
+      "source": [
+        "watch('RULES', 'FACTS')"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "5pi3hP4gKctH",
+        "outputId": "d3442d54-92c2-4dd9-b3b7-5663eb9891cc"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-0>: InitialFact()\n",
+            "INFO:experta.watchers.FACTS: ==> <f-1>: Promo(tipo='2x1', producto='Dodot')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-2>: Promo(tipo='2x1', producto='Leche Pascual')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-3>: Promo(tipo='3x2', producto='Pilas AAA')\n"
+          ]
+        }
+      ],
+      "source": [
+        "nxm = OfertasNxM()\n",
+        "nxm.reset()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "jz0qSAfsKi3q",
+        "outputId": "4dc02714-b975-4c15-8bd9-d886bce4442d"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-4>: Producto(nombre='Dodot')\n"
+          ]
+        },
+        {
+          "data": {
+            "text/plain": [
+              "Producto(nombre='Dodot')"
+            ]
+          },
+          "execution_count": null,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "nxm.declare(Producto(nombre=\"Dodot\"))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8VTcR0i4Kk0Q",
+        "outputId": "4c06c217-f371-49ea-a0c2-69a89a6202bc"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-5>: Producto(nombre='Agua Mineral')\n"
+          ]
+        },
+        {
+          "data": {
+            "text/plain": [
+              "Producto(nombre='Agua Mineral')"
+            ]
+          },
+          "execution_count": null,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "nxm.declare(Producto(nombre=\"Agua Mineral\"))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "PxQK_VPYKmhC",
+        "outputId": "48fa762e-dc07-4816-f4a6-93985e21c9a0"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-6>: Producto(nombre='Pilas AAA')\n"
+          ]
+        },
+        {
+          "data": {
+            "text/plain": [
+              "Producto(nombre='Pilas AAA')"
+            ]
+          },
+          "execution_count": null,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "nxm.declare(Producto(nombre=\"Pilas AAA\"))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "T9QGX-stKsCO",
+        "outputId": "95d4a01a-afdd-45bf-ad56-008ece6e2479"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.RULES:FIRE 1 oferta_nxm: <f-6>, <f-3>\n",
+            "INFO:experta.watchers.FACTS: ==> <f-7>: Cupon(tipo='3x2', producto='Pilas AAA')\n",
+            "INFO:experta.watchers.RULES:FIRE 2 oferta_nxm: <f-1>, <f-4>\n",
+            "INFO:experta.watchers.FACTS: ==> <f-8>: Cupon(tipo='2x1', producto='Dodot')\n"
+          ]
+        }
+      ],
+      "source": [
+        "nxm.run()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "TbTzA9q2KyUK"
+      },
+      "source": [
+        "## Objetivo 2\n",
+        "### Fomentar el consumo de otros productos\n",
+        "\n",
+        "Para lograr este objetivo generaremos cupones con packs descuento. Ejemplo:\n",
+        "\n",
+        "* Si compras una fregona y una mopa a la vez, tienes un 25% de descuento en ambos productos\n",
+        "\n",
+        "#### Implementación"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "9-M5za3gKy7J"
+      },
+      "outputs": [],
+      "source": [
+        "class OfertasPACK(KnowledgeEngine):\n",
+        "    @DefFacts()\n",
+        "    def carga_promociones_pack(self):\n",
+        "        \"\"\"Genera las promociones vigentes\"\"\"\n",
+        "        yield Promo(tipo=\"PACK\", producto1=\"Fregona ACME\", producto2=\"Mopa ACME\", descuento=\"25%\")\n",
+        "        yield Promo(tipo=\"PACK\", producto1=\"Pasta Gallo\", producto2=\"Tomate Frito\", descuento=\"10%\")\n",
+        "\n",
+        "    @Rule(Promo(tipo=\"PACK\", producto1=MATCH.p1, producto2=MATCH.p2, descuento=MATCH.d),\n",
+        "          OR(\n",
+        "              AND(\n",
+        "                  NOT(Producto(nombre=MATCH.p1)),\n",
+        "                  Producto(nombre=MATCH.p2)\n",
+        "              ),\n",
+        "              AND(\n",
+        "                  Producto(nombre=MATCH.p1),\n",
+        "                  NOT(Producto(nombre=MATCH.p2))\n",
+        "              )\n",
+        "          )\n",
+        "    )\n",
+        "    def pack(self, p1, p2, d):\n",
+        "        \"\"\"\n",
+        "        El cliente querrá comprar un producto adicional en su próxima visita.\n",
+        "        \"\"\"\n",
+        "        self.declare(CuDodpon(tipo=\"PACK\", producto1=p1, producto2=p2, descuento=d))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "oKzKuTwWK2E4"
+      },
+      "source": [
+        "#### Pruebas"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "PSRoE-e5I5Kd"
+      },
+      "outputs": [],
+      "source": [
+        "pack = OfertasPACK()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "XJu7ulUGI5Kd",
+        "outputId": "2f79e54f-d4b6-4a87-89f8-c4441acb2a03"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-0>: InitialFact()\n",
+            "INFO:experta.watchers.FACTS: ==> <f-1>: Promo(tipo='PACK', producto1='Fregona ACME', producto2='Mopa ACME', descuento='25%')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-2>: Promo(tipo='PACK', producto1='Pasta Gallo', producto2='Tomate Frito', descuento='10%')\n"
+          ]
+        }
+      ],
+      "source": [
+        "pack.reset()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "V9WGF6AlI5Kd",
+        "outputId": "6bbe010d-e4e7-45db-ecf8-95255d6f5895"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-3>: Producto(nombre='Tomate Frito')\n"
+          ]
+        },
+        {
+          "data": {
+            "text/plain": [
+              "Producto(nombre='Tomate Frito')"
+            ]
+          },
+          "execution_count": null,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "pack.declare(Producto(nombre=\"Tomate Frito\"))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "i4WVZ5L1I5Ke",
+        "outputId": "b9affff4-84e2-4f3e-b424-0b26bb277a3c"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-4>: Producto(nombre='Fregona ACME')\n"
+          ]
+        },
+        {
+          "data": {
+            "text/plain": [
+              "Producto(nombre='Fregona ACME')"
+            ]
+          },
+          "execution_count": null,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "pack.declare(Producto(nombre=\"Fregona ACME\"))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "uLRMB9h5I5Ke",
+        "outputId": "271e1c4d-b533-4045-b4ae-4c4b0e978fc1"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.RULES:FIRE 1 pack: <f-4>, <f-1>\n",
+            "INFO:experta.watchers.FACTS: ==> <f-5>: Cupon(tipo='PACK', producto1='Fregona ACME', producto2='Mopa ACME', descuento='25%')\n",
+            "INFO:experta.watchers.RULES:FIRE 2 pack: <f-3>, <f-2>\n",
+            "INFO:experta.watchers.FACTS: ==> <f-6>: Cupon(tipo='PACK', producto1='Pasta Gallo', producto2='Tomate Frito', descuento='10%')\n"
+          ]
+        }
+      ],
+      "source": [
+        "pack.run()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "kMUfc2NNK6uM"
+      },
+      "outputs": [],
+      "source": [
+        ""
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "R4QLos8EI5Kf"
+      },
+      "source": [
+        "## Objetivo 3\n",
+        "### Fomentar el consumo de productos con más margen de beneficio\n",
+        "\n",
+        "El truco para cumplir este objetivo es conocer qué beneficio se obtiene por cada producto, y si existe un producto del mismo **tipo** con un beneficio mayor, generar un cupón de descuento para ese producto que nos permita seguir ganando más.\n",
+        "\n",
+        "#### Implementación"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "fZKCILK-I5Kg"
+      },
+      "outputs": [],
+      "source": [
+        "class OfertasDescuento(KnowledgeEngine):\n",
+        "    @DefFacts()\n",
+        "    def carga_beneficios(self):\n",
+        "        \"\"\"\n",
+        "        Define las beneficios por producto.\n",
+        "        \"\"\"\n",
+        "        yield Beneficio(nombre=\"Mahou\", tipo=\"Cerveza\", ganancias=0.5)\n",
+        "        yield Beneficio(nombre=\"Cerveza Hacendado\", tipo=\"Cerveza\", ganancias=0.9)\n",
+        "\n",
+        "        yield Beneficio(nombre=\"Pilas AAA Duracell\", tipo=\"Pilas AAA\", ganancias=1.5)\n",
+        "        yield Beneficio(nombre=\"Pilas AAA Hacendado\", tipo=\"Pilas AAA\", ganancias=2)\n",
+        "        \n",
+        "    @Rule(Producto(nombre=MATCH.p1),\n",
+        "          Beneficio(nombre=MATCH.p1, tipo=MATCH.t, ganancias=MATCH.g1),\n",
+        "          Beneficio(nombre=MATCH.p2, tipo=MATCH.t, ganancias=MATCH.g2),\n",
+        "          TEST(lambda g1, g2: g2 > g1)\n",
+        "    )\n",
+        "    def descuento_producto_con_mayor_beneficio(self, p2, g1, g2, **_):\n",
+        "        \"\"\"\n",
+        "        \"\"\"\n",
+        "        diferencia_ganancia = g2 - g1\n",
+        "        self.declare(Cupon(tipo=\"DESCUENTO\",\n",
+        "                           producto=p2,\n",
+        "                           cantidad=diferencia_ganancia / 2))"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "RhL9RioDI5Kg"
+      },
+      "source": [
+        "#### Pruebas"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "Gq3vud-cI5Kh"
+      },
+      "outputs": [],
+      "source": [
+        "descuento = OfertasDescuento()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "1UH9BdFyI5Kh",
+        "outputId": "905d0920-e6aa-4fc1-be79-7008440c7748"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-0>: InitialFact()\n",
+            "INFO:experta.watchers.FACTS: ==> <f-1>: Beneficio(nombre='Mahou', tipo='Cerveza', ganancias=0.5)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-2>: Beneficio(nombre='Cerveza Hacendado', tipo='Cerveza', ganancias=0.9)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-3>: Beneficio(nombre='Pilas AAA Duracell', tipo='Pilas AAA', ganancias=1.5)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-4>: Beneficio(nombre='Pilas AAA Hacendado', tipo='Pilas AAA', ganancias=2)\n"
+          ]
+        }
+      ],
+      "source": [
+        "descuento.reset()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "otf8dzoSI5Kh",
+        "outputId": "52c6c365-d4d9-4c09-8c7d-241d796c9878"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-5>: Producto(nombre='Mahou')\n"
+          ]
+        },
+        {
+          "data": {
+            "text/plain": [
+              "Producto(nombre='Mahou')"
+            ]
+          },
+          "execution_count": null,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "descuento.declare(Producto(nombre=\"Mahou\"))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "FPzY7ZmII5Ki",
+        "outputId": "0304443a-7587-4f63-ad11-4ea24ba2b4c3"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.RULES:FIRE 1 descuento_producto_con_mayor_beneficio: <f-1>, <f-2>, <f-5>\n",
+            "INFO:experta.watchers.FACTS: ==> <f-6>: Cupon(tipo='DESCUENTO', producto='Cerveza Hacendado', cantidad=0.2)\n"
+          ]
+        }
+      ],
+      "source": [
+        "descuento.run()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "iitOEJEAI5Ki"
+      },
+      "source": [
+        "**El sistema no debe generar cupón si se ha comprado el producto con mayor beneficio**"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Fso1tn5QI5Ki",
+        "outputId": "0c884267-8168-4679-8121-ccd84b37d09d"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-0>: InitialFact()\n",
+            "INFO:experta.watchers.FACTS: ==> <f-1>: Beneficio(nombre='Mahou', tipo='Cerveza', ganancias=0.5)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-2>: Beneficio(nombre='Cerveza Hacendado', tipo='Cerveza', ganancias=0.9)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-3>: Beneficio(nombre='Pilas AAA Duracell', tipo='Pilas AAA', ganancias=1.5)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-4>: Beneficio(nombre='Pilas AAA Hacendado', tipo='Pilas AAA', ganancias=2)\n"
+          ]
+        }
+      ],
+      "source": [
+        "descuento.reset()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "gZrwEZvTI5Ki",
+        "outputId": "212c0823-f184-422b-f828-b6abf5182204"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-5>: Producto(nombre='Pilas AAA Hacendado')\n"
+          ]
+        },
+        {
+          "data": {
+            "text/plain": [
+              "Producto(nombre='Pilas AAA Hacendado')"
+            ]
+          },
+          "execution_count": null,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "descuento.declare(Producto(nombre=\"Pilas AAA Hacendado\"))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "Xg6TaJQUI5Kj"
+      },
+      "outputs": [],
+      "source": [
+        "descuento.run()"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "qgcep5n2I5Kj"
+      },
+      "source": [
+        "## Juntándolo todo\n",
+        "Gracias a **Python** podemos utilizar herencia múltiple para unir nuestros distintos motores en uno y darle un mejor interfaz de usuario."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "dC0Ai8UsI5Kj"
+      },
+      "outputs": [],
+      "source": [
+        "class GeneradorCupones(OfertasNxM, OfertasPACK, OfertasDescuento):\n",
+        "    def generar_cupones(self, *nombre_productos):\n",
+        "        # Reiniciamos el motor\n",
+        "        self.reset()\n",
+        "\n",
+        "        # Declaramos los productos que ha comprado el cliente\n",
+        "        for nombre in nombre_productos:\n",
+        "            self.declare(Producto(nombre=nombre))\n",
+        "\n",
+        "        # Ejecutamos el motor\n",
+        "        self.run()\n",
+        "        \n",
+        "        # Extraemos las promociones generadas\n",
+        "        for fact in self.facts.values():\n",
+        "            if isinstance(fact, Cupon):\n",
+        "                yield fact"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true
+        },
+        "id": "7a4gGEBkI5Kj"
+      },
+      "outputs": [],
+      "source": [
+        "ke = GeneradorCupones()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "background_save": true,
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "EAg7G1SKI5Kk",
+        "outputId": "58f0d847-4057-49ef-dc68-2be72777e847"
+      },
+      "outputs": [
+        {
+          "name": "stderr",
+          "output_type": "stream",
+          "text": [
+            "INFO:experta.watchers.FACTS: ==> <f-0>: InitialFact()\n",
+            "INFO:experta.watchers.FACTS: ==> <f-1>: Beneficio(nombre='Mahou', tipo='Cerveza', ganancias=0.5)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-2>: Beneficio(nombre='Cerveza Hacendado', tipo='Cerveza', ganancias=0.9)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-3>: Beneficio(nombre='Pilas AAA Duracell', tipo='Pilas AAA', ganancias=1.5)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-4>: Beneficio(nombre='Pilas AAA Hacendado', tipo='Pilas AAA', ganancias=2)\n",
+            "INFO:experta.watchers.FACTS: ==> <f-5>: Promo(tipo='2x1', producto='Dodot')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-6>: Promo(tipo='2x1', producto='Leche Pascual')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-7>: Promo(tipo='3x2', producto='Pilas AAA')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-8>: Promo(tipo='PACK', producto1='Fregona ACME', producto2='Mopa ACME', descuento='25%')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-9>: Promo(tipo='PACK', producto1='Pasta Gallo', producto2='Tomate Frito', descuento='10%')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-10>: Producto(nombre='Pilas AAA')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-11>: Producto(nombre='Mahou')\n",
+            "INFO:experta.watchers.FACTS: ==> <f-12>: Producto(nombre='Tomate Frito')\n",
+            "INFO:experta.watchers.RULES:FIRE 1 pack: <f-9>, <f-12>\n",
+            "INFO:experta.watchers.FACTS: ==> <f-13>: Cupon(tipo='PACK', producto1='Pasta Gallo', producto2='Tomate Frito', descuento='10%')\n",
+            "INFO:experta.watchers.RULES:FIRE 2 descuento_producto_con_mayor_beneficio: <f-1>, <f-2>, <f-11>\n",
+            "INFO:experta.watchers.FACTS: ==> <f-14>: Cupon(tipo='DESCUENTO', producto='Cerveza Hacendado', cantidad=0.2)\n",
+            "INFO:experta.watchers.RULES:FIRE 3 oferta_nxm: <f-7>, <f-10>\n",
+            "INFO:experta.watchers.FACTS: ==> <f-15>: Cupon(tipo='3x2', producto='Pilas AAA')\n"
+          ]
+        },
+        {
+          "data": {
+            "text/plain": [
+              "[Cupon(tipo='PACK', producto1='Pasta Gallo', producto2='Tomate Frito', descuento='10%'),\n",
+              " Cupon(tipo='DESCUENTO', producto='Cerveza Hacendado', cantidad=0.2),\n",
+              " Cupon(tipo='3x2', producto='Pilas AAA')]"
+            ]
+          },
+          "execution_count": null,
+          "metadata": {},
+          "output_type": "execute_result"
+        }
+      ],
+      "source": [
+        "[cupon for cupon in ke.generar_cupones(\"Pilas AAA\", \"Mahou\", \"Tomate Frito\")]"
+      ]
+    }
+  ],
+  "metadata": {
+    "colab": {
+      "collapsed_sections": [],
+      "name": "1-SistemasExpertos.ipynb",
+      "provenance": []
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
+}
