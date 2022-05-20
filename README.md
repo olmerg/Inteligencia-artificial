@@ -1,7 +1,16 @@
-## 
-Este repositorio contiene  los elementos requeridos para el desarrollo de aplicaciones basadas en imágenes, y proporciona una serie de laboratorios de código para el desarrollo de los mismos a través de la inteligencia artificial.
+# Curso de Inteligencia Artificial
 
-# **Temática**
+Este repositorio presenta los ejercicios realizados durante el curso de inteligencia artificial, el cual tiene un enfoque en buscar entender los algoritmos  desde la forma como pensamos y eso como se modela con matematica. 
+Iniciamos el curso revisando como los sistemas expertos es un motor de logica de primer orden que permite de forma sencilla agregar reglas para crear un pensamiento deductivo.  Luego entramos en el pensamiento inductivo con técnicas de machine learning como arboles de decisión (encontrar las reglas a través de los datos) y Naives-Bayes (encontrar las reglas teniendo encuenta tendencias de probabilidad). 
+
+La segunda parte del curso inicia con el estudio del algoritmo del gradiente, para plantearnos la idea de la inteligencia como un proceso de optimización y como principal exponente la regresión lineal, Lasso o Ridge.  Con base en estos conceptos entramos a revisar las redes neuronales como una forma de modelar como funciona el hardware de nuestro cerebro. Aqui hicimos una pausa en el estudio de la AI, para especializar el curso en imagenes, comprendiendo por medio de ejercicios el procesamiento digital de imagenes y algunos de sus principales conceptos.
+
+La ultima parte del curso nos adentramos en el tema de deep learning aplicado a imagenes, donde los estudiantes estudian diferentes modelos preentrenados de deep learning y en clase revisamos los procesos de creaciòn de modelos y transfer learning con ejercicios. Esto permite dividir el curso en dos partes , un proyecto donde aplican estos conceptos a imagenes y una revisión a las técnicas basadas en medidas de distancia (SVM,K-Nearest Neighbors, k-means, pca,..). Finalmente, sin mucho impulso llegamos a la definición de la inteligencia basado en modelos bioinspirados no tan egocentricos como algoritmos geneticos, computación evolutiva, Swarm optimization, o las colonias de hormigas.
+
+La primera parte del curso se basa en la idea narrada en el libro [Human Compatible: Artificial Intelligence and the Problem of Control](https://www.amazon.com/-/es/Stuart-Russell/dp/0525558616) de Stuart Russell, el cual recomiendo como libro de lectura recomendado. La segunda parte es mas mi aproximación, cualquier feedback seria genial.
+
+
+## **Ejercicios**
 
 ### [**Introducción a Jupyter**](https://colab.research.google.com/drive/1TXMSqCnuOOVvrRZnstAhGgrvsvzDg7gZ?usp=sharing)
 Este tema proporciona una entrada a los principales conceptos de Jupyter, haciendo referencia a Python y Markdown. Incluye una seríe de ejemplos sobre el manejo de elementos básicos de python, así como el cargue de archivos en formatos JSON, CSV Y texto plano. 
